@@ -1,0 +1,47 @@
+version: '3.4'
+
+
+services:
+  mssql-database:
+    container_name: MsSqlDatabase 
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    volumes:
+        - ./.containers/database:/var/opt/mssql/data    
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "sa123_ secret_@#TYuiop"   
+    ports:
+      - "1433:1433"
+
+  api:
+    container_name: Api
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: App/Api/Dockerfile
+    ports:
+        - "5001:443"
+    depends_on:
+        - mssql-database
+
+  report:
+    container_name: Report
+    image: ${DOCKER_REGISTRY-}report
+    build:
+      context: .
+      dockerfile: Report/Report.Api/Dockerfile
+    ports:
+        - "6001:443"
+    depends_on:
+        - mssql-database
+
+  rabbitmq-instance:
+    container_name: RabbitMQ.MessageBroker
+    image: rabbitmq:management
+    hostname: mq-message
+    volumes:
+        - ./.containers/queue/data/:/var/lib/rabbitmq
+        - ./.containers/queue/log/:/var/log/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_pass: guest

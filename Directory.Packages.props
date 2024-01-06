@@ -1,0 +1,9 @@
+<Project>
+	<PropertyGroup>
+		<ManagePackgeVersionsCentrally>true</ManagePackgeVersionsCentrally>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+	<!--<GlobalPackageReference Include="OnPage" Version="7.0.0.1" />-->
+</Project>
