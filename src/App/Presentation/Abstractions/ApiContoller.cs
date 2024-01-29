@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Presentation.Abstractions;
 [ApiController]

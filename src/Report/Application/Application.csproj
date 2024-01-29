@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
@@ -10,6 +10,7 @@
 		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\..\Common\Contracts\Contracts.csproj" />
 		<ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
 

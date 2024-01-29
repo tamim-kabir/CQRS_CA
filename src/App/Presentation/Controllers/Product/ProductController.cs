@@ -18,7 +18,7 @@ public sealed class ProductController : ApiContoller
         var command = new CreateProductCommand("Phone", 10, "str");
         var result = await _sender.Send(command, cancellationToken);
 
-        return Result(result); 
+        return Result(result);
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(int id, CancellationToken cancellationToken)

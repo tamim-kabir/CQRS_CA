@@ -1,6 +1,5 @@
-﻿using Domain.Repositories.IProduct;
-using Persistence.Contexts;
-using Domain.Entities;
+﻿using Domain.Entities;
+using Domain.Repositories.IProduct;
 
 namespace Persistence.Repositories.Products;
 internal sealed class ProductRepository : IProductRepository
@@ -21,6 +20,6 @@ internal sealed class ProductRepository : IProductRepository
     }
     public Task<List<Product>> GetAllProducts()
     {
-        return Task.FromResult(new List<Product>()); 
+        return Task.FromResult(new List<Product>());
     }
 }

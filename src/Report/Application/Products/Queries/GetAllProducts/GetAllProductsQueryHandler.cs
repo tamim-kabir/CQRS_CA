@@ -21,7 +21,7 @@ internal sealed class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQ
             new GetAllProductsResponse(1, "Light", "L"),
             new GetAllProductsResponse(1, "Laptop", "L"),
         };
-        if(products.Count <= 0 )
+        if (products.Count <= 0)
         {
             return Result.Failure<List<GetAllProductsResponse>>(new Error(
                     "Product.NotFound",

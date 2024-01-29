@@ -1,6 +1,5 @@
 version: '3.4'
 
-
 services:
   mssql-database:
     container_name: MsSqlDatabase 
@@ -9,7 +8,7 @@ services:
         - ./.containers/database:/var/opt/mssql/data    
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "sa123_ secret_@#TYuiop"   
+      SA_PASSWORD: "sa123_secret_@#TYuiop"   
     ports:
       - "1433:1433"
 
@@ -18,7 +17,7 @@ services:
     image: ${DOCKER_REGISTRY-}api
     build:
       context: .
-      dockerfile: App/Api/Dockerfile
+      dockerfile: src/App/Api/Dockerfile
     ports:
         - "5001:443"
     depends_on:
@@ -29,7 +28,7 @@ services:
     image: ${DOCKER_REGISTRY-}report
     build:
       context: .
-      dockerfile: Report/Report.Api/Dockerfile
+      dockerfile: src/Report/Report.Api/Dockerfile
     ports:
         - "6001:443"
     depends_on:
@@ -44,4 +43,8 @@ services:
         - ./.containers/queue/log/:/var/log/rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_pass: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      #CELERY_BROKER_URL: "amqp://rabbitmq-instanc:5672"
+    ports:
+      - '5672:5672'
+      - '15672:15672'

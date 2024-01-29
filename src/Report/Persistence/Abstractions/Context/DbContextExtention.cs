@@ -1,20 +1,20 @@
-﻿using Domain.Premetives;
+﻿using Domain.Entities.Core.Audit;
+using Domain.Enums.Audit;
+using Domain.Premetives;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Contexts;
-using System.Net.Sockets;
-using System.Net;
-using System.Security.Claims;
-using Persistence.Configarations;
-using Domain.Entities.Core.Audit;
-using Domain.Enums.Audit;
-using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Persistence.Configarations;
+using Persistence.Contexts;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Claims;
 
 namespace Persistence.Abstractions.Context;
 public abstract class DbContextExtention : DbContext
 {
-    protected internal readonly HttpContext _httpContext;
+    protected internal readonly HttpContext? _httpContext;
     internal DbContextExtention(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
     {
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -31,22 +31,20 @@ public abstract class DbContextExtention : DbContext
         }
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         base.OnModelCreating(builder);
-        
+
     }
 
-    private string GetRemoteIpAddress(HttpRequest request)
+    private string GetRemoteIpAddress(HttpRequest? request)
     {
-        string ip = "::1";
-        if (request != null)
+        string? ip = "::1";
+        if (request is { HttpContext: not null })
         {
-            ip = request.HttpContext.Connection.RemoteIpAddress.ToString();
+            ip = request.HttpContext.Connection.RemoteIpAddress?.ToString();
         }
-
         if (ip == "::1")
         {
             ip = GetLocalIpAddress();
         }
-
         return ip ?? "System";
     }
     private string GetLocalIpAddress()
@@ -63,7 +61,7 @@ public abstract class DbContextExtention : DbContext
     }
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        string userId = _httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId = _httpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
             switch (entry.State)
@@ -71,7 +69,7 @@ public abstract class DbContextExtention : DbContext
                 case EntityState.Added:
                     entry.Entity.CreatedBy = userId ?? "System";
                     entry.Entity.CreatedDate = DateTime.UtcNow;
-                    entry.Entity.CreatedIPAddress = GetRemoteIpAddress(_httpContext.Request);
+                    entry.Entity.CreatedIPAddress = GetRemoteIpAddress(_httpContext?.Request);
 
                     break;
                 case EntityState.Modified:
@@ -79,13 +77,13 @@ public abstract class DbContextExtention : DbContext
                     {
                         entry.Entity.DeletedBy = userId ?? "System";
                         entry.Entity.DeletedTime = DateTime.UtcNow;
-                        entry.Entity.DeletedIPAddress = GetRemoteIpAddress(_httpContext.Request);
+                        entry.Entity.DeletedIPAddress = GetRemoteIpAddress(_httpContext?.Request);
                     }
                     else
                     {
                         entry.Entity.LastModifiedBy = userId ?? "System";
                         entry.Entity.LastModifiedDate = DateTime.UtcNow;
-                        entry.Entity.ModifiedIPAddress = GetRemoteIpAddress(_httpContext.Request);
+                        entry.Entity.ModifiedIPAddress = GetRemoteIpAddress(_httpContext?.Request);
                     }
                     break;
             }
@@ -94,9 +92,9 @@ public abstract class DbContextExtention : DbContext
         {
             return await base.SaveChangesAsync(cancellationToken);
         }
-        return await SaveChangesAsync(userId);
+        return await SaveChangesAsync(userId, cancellationToken);
     }
-    public virtual async Task<int> SaveChangesAsync(string userId = null)
+    public virtual async Task<int> SaveChangesAsync(string? userId = null, CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
@@ -105,20 +103,20 @@ public abstract class DbContextExtention : DbContext
                 case EntityState.Added:
                     entry.Entity.CreatedBy = userId ?? "System";
                     entry.Entity.CreatedDate = DateTime.UtcNow;
-                    entry.Entity.CreatedIPAddress = GetRemoteIpAddress(_httpContext.Request);
+                    entry.Entity.CreatedIPAddress = GetRemoteIpAddress(_httpContext?.Request);
                     break;
                 case EntityState.Modified:
                     if (entry.Entity.Deleted)
                     {
                         entry.Entity.DeletedBy = userId ?? "System";
                         entry.Entity.DeletedTime = DateTime.UtcNow;
-                        entry.Entity.DeletedIPAddress = GetRemoteIpAddress(_httpContext.Request);
+                        entry.Entity.DeletedIPAddress = GetRemoteIpAddress(_httpContext?.Request);
                     }
                     else
                     {
                         entry.Entity.LastModifiedBy = userId ?? "System";
                         entry.Entity.LastModifiedDate = DateTime.UtcNow;
-                        entry.Entity.ModifiedIPAddress = GetRemoteIpAddress(_httpContext.Request);
+                        entry.Entity.ModifiedIPAddress = GetRemoteIpAddress(_httpContext?.Request);
                     }
                     break;
             }
@@ -128,7 +126,7 @@ public abstract class DbContextExtention : DbContext
         await OnAfterSaveChanges(auditEntries);
         return result;
     }
-    private List<AuditEntry> OnBeforeSaveChanges(string userId)
+    private List<AuditEntry> OnBeforeSaveChanges(string? userId)
     {
         ChangeTracker.DetectChanges();
         var auditEntries = new List<AuditEntry>();
@@ -143,6 +141,10 @@ public abstract class DbContextExtention : DbContext
             auditEntries.Add(auditEntry);
             foreach (var property in entry.Properties)
             {
+                if (property is { CurrentValue: null } || property is { OriginalValue: null })
+                {
+                    continue;
+                }
                 if (property.IsTemporary)
                 {
                     auditEntry.TemporaryProperties.Add(property);
@@ -186,7 +188,7 @@ public abstract class DbContextExtention : DbContext
         }
         return auditEntries.Where(_ => _.HasTemporaryProperties).ToList();
     }
-    private Task OnAfterSaveChanges(List<AuditEntry> auditEntries)
+    private Task OnAfterSaveChanges(List<AuditEntry> auditEntries, CancellationToken cancellationToken = default)
     {
         if (auditEntries == null || auditEntries.Count == 0)
             return Task.CompletedTask;
@@ -195,6 +197,10 @@ public abstract class DbContextExtention : DbContext
         {
             foreach (var prop in auditEntry.TemporaryProperties)
             {
+                if (prop is { CurrentValue: null })
+                {
+                    continue;
+                }
                 if (prop.Metadata.IsPrimaryKey())
                 {
                     auditEntry.KeyValues[prop.Metadata.Name] = prop.CurrentValue;
@@ -211,9 +217,9 @@ public abstract class DbContextExtention : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
 #if DEBUG
-        optionsBuilder.LogTo(x => 
-            Debug.WriteLine("Api Database --> \n" + x + "\n"), 
-            LogLevel.Information, 
+        optionsBuilder.LogTo(x =>
+            Debug.WriteLine("Api Database --> \n" + x + "\n"),
+            LogLevel.Information,
             Microsoft.EntityFrameworkCore.Diagnostics.DbContextLoggerOptions.None);
 #endif
     }

@@ -1,15 +1,15 @@
-﻿using Domain.Premetives;
+﻿using Domain.Entities.Core.Audit;
+using Domain.Enums.Audit;
+using Domain.Premetives;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Contexts;
-using System.Net.Sockets;
-using System.Net;
-using System.Security.Claims;
-using Persistence.Configarations;
-using Domain.Entities.Core.Audit;
-using Domain.Enums.Audit;
-using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Persistence.Configarations;
+using Persistence.Contexts;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Claims;
 
 namespace Persistence.Abstractions.Context;
 public abstract class DbContextExtention : DbContext
@@ -31,7 +31,7 @@ public abstract class DbContextExtention : DbContext
         }
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         base.OnModelCreating(builder);
-        
+
     }
 
     private string GetRemoteIpAddress(HttpRequest request)
@@ -211,9 +211,9 @@ public abstract class DbContextExtention : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
 #if DEBUG
-        optionsBuilder.LogTo(x => 
-            Debug.WriteLine("Api Database --> \n" + x + "\n"), 
-            LogLevel.Information, 
+        optionsBuilder.LogTo(x =>
+            Debug.WriteLine("Api Database --> \n" + x + "\n"),
+            LogLevel.Information,
             Microsoft.EntityFrameworkCore.Diagnostics.DbContextLoggerOptions.None);
 #endif
     }

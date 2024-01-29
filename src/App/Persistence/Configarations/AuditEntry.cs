@@ -33,6 +33,6 @@ public class AuditEntry
             OldValues = OldValues.Count == 0 ? null : JsonConvert.SerializeObject(OldValues),
             NewValues = NewValues.Count == 0 ? null : JsonConvert.SerializeObject(NewValues),
             AffectedColumns = ChangedColumns.Count == 0 ? null : JsonConvert.SerializeObject(ChangedColumns)
-        };         
+        };
     }
 }

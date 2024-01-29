@@ -1,4 +1,4 @@
-﻿using Application.Products.Commands.CreateProduct;
+﻿using Application.Products.Queries.GetProductById;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -11,10 +11,10 @@ public class ProductEndpoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("api/endpoint");
-        group.MapPost("/createProduct", async (ISender sender, CancellationToken cancellationToken) =>
+        group.MapPost("/GetProduct", async (int id, ISender sender, CancellationToken cancellationToken) =>
         {
-            var command = new CreateProductCommand("Phone", 10, "str");
-            var result = await sender.Send(command, cancellationToken);
+            var query = new GetProductByIdQuery(id);
+            var result = await sender.Send(query, cancellationToken);
 
             return TypedResults.Ok(result);
         });

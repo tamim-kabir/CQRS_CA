@@ -7,19 +7,8 @@ using Presentation.Abstractions;
 
 namespace Presentation.Controllers.Product;
 [Route("api/product")]
-public sealed class ProductController : ApiContoller
+public sealed class ProductController(ISender sender) : ApiContoller(sender)
 {
-    public ProductController(ISender sender) : base(sender)
-    {
-    }
-    [HttpPost]
-    public async Task<IActionResult> CreateProduct(CancellationToken cancellationToken)
-    {
-        var command = new CreateProductCommand("Phone", 10, "str");
-        var result = await _sender.Send(command, cancellationToken);
-
-        return Result(result); 
-    }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(int id, CancellationToken cancellationToken)
     {

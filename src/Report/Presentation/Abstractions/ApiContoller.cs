@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Presentation.Abstractions;
 [ApiController]
@@ -19,12 +18,12 @@ public abstract class ApiContoller : ControllerBase
     internal dynamic Result(Result command, [CallerMemberName] string memberName = "")
     {
         var info = new StackFrame(1, true)?.GetMethod();
-        var member = ((TypeInfo)info.DeclaringType
-                                    .DeclaringType)
-                                    .DeclaredMethods
-                                    .FirstOrDefault(x => x.Name.Equals(memberName));
+        var member = ((TypeInfo?)info?.DeclaringType
+                                    ?.DeclaringType)
+                                    ?.DeclaredMethods
+                                    ?.FirstOrDefault(x => x.Name.Equals(memberName));
 
-        var httpMethodAttribute = member.GetCustomAttributes(false)
+        var httpMethodAttribute = member?.GetCustomAttributes(false)
                                         .FirstOrDefault(x => x is HttpMethodAttribute);
         return httpMethodAttribute switch
         {
@@ -35,12 +34,12 @@ public abstract class ApiContoller : ControllerBase
     internal dynamic Result<T>(Result<T> result, [CallerMemberName] string memberName = "") where T : class
     {
         var info = new StackFrame(1, true)?.GetMethod();
-        var member = ((TypeInfo)info.DeclaringType
-                                    .DeclaringType)
-                                    .DeclaredMethods
+        var member = ((TypeInfo?)info?.DeclaringType
+                                    ?.DeclaringType)
+                                    ?.DeclaredMethods
                                     .FirstOrDefault(x => x.Name.Equals(memberName));
 
-        var httpMethodAttribute = member.GetCustomAttributes(false)
+        var httpMethodAttribute = member?.GetCustomAttributes(false)
                                         .FirstOrDefault(x => x is HttpMethodAttribute);
         return httpMethodAttribute switch
         {

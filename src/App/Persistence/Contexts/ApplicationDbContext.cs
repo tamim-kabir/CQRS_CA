@@ -9,5 +9,5 @@ public class ApplicationDbContext : DbContextExtention
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options, httpContextAccessor)
     {
     }
-    public DbSet<Product> Product { get; set; }    
+    public DbSet<Product> Product { get; set; }
 }

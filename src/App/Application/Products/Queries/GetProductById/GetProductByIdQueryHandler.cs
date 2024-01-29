@@ -15,7 +15,7 @@ internal sealed class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQ
     public async Task<Result<GetProductByIdResponse>> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
         var product = await _repository.GetProductById(request.Id, cancellationToken);
-        if(product is  null)
+        if (product is null)
         {
             return Result.Failure<GetProductByIdResponse>(new Error(
                 "Product.NotFound",
