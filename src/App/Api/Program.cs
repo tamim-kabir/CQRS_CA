@@ -22,19 +22,20 @@ builder.Services.DatabaseConfiguration(builder.Configuration);
 
 builder.Services.AddControllers()
                 .AddApplicationPart(Presentation.AssemblyReference.Assembly);
+var AppAssebbly = Application.AssemblyReference.Assembly;
 builder.Services.AddMediatR(config =>
-    config.RegisterServicesFromAssembly(Application.AssemblyReference.Assembly));
+    config.RegisterServicesFromAssembly(AppAssebbly));
 
-builder.Services.AddValidatorsFromAssembly(Application.AssemblyReference.Assembly);
+builder.Services.AddValidatorsFromAssembly(AppAssebbly);
 
 builder.Services.AddMassTransit(config =>
 {
     config.SetKebabCaseEndpointNameFormatter();
-    var assembly = Assembly.GetEntryAssembly();
-    config.AddConsumers(assembly);
-    config.AddSagaStateMachines(assembly);
-    config.AddSagas(assembly);
-    config.AddActivities(assembly);
+
+    config.AddConsumers(AppAssebbly);
+    config.AddSagaStateMachines(AppAssebbly);
+    config.AddSagas(AppAssebbly);
+    config.AddActivities(AppAssebbly);
 
     config.UsingRabbitMq((context, configurator) =>
     {
