@@ -48,3 +48,13 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+    
+  tenantServices:
+    container_name: tenant
+    image: ${DOCKER_REGISTRY-}tenant
+    build:
+      context: .
+      dockerfile: src/Common/TenantServices/Dockerfile
+    depends_on:
+        - mssql-database
+  

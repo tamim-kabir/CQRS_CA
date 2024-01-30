@@ -2,6 +2,7 @@
 using Domain.Enums.Audit;
 using Domain.Premetives;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Persistence.Configarations;
@@ -31,7 +32,6 @@ public abstract class DbContextExtention : DbContext
         }
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         base.OnModelCreating(builder);
-
     }
 
     private string GetRemoteIpAddress(HttpRequest request)
