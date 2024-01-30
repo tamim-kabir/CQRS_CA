@@ -13,7 +13,7 @@ internal class Tenant
     [MaxLength(500)]
     internal string? ConnectionString { get; private set; }
 
-    internal Tenant CreateTenant(TenantViewModel model)
+    internal static Tenant? CreateTenant(TenantViewModel model)
     {
         return new Tenant
         {

@@ -4,11 +4,19 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<InvariantGlobalization>true</InvariantGlobalization>
+		<InvariantGlobalization>false</InvariantGlobalization>
 		<UserSecretsId>3d7a2c1f-dbe1-42bb-96ec-eea9286c75cb</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>..\..\..</DockerfileContext>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="WeatherForecast.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="TenantServices.http" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
@@ -18,7 +26,10 @@
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
 </Project>

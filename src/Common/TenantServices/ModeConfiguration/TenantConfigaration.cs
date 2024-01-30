@@ -12,7 +12,9 @@ internal class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.Property(t => t.Id).HasConversion(
             tenantId => tenantId.Value,
             value => new TenantId(value));
-
+        builder.Property(t => t.Name);
+        builder.Property(t => t.Provider);
+        builder.Property(t => t.ConnectionString).HasMaxLength(500);
         builder.HasIndex(t => t.Id);
     }
 }

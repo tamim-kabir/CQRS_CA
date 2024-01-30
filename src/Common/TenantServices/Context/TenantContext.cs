@@ -7,7 +7,7 @@ internal class TenantContext(DbContextOptions<TenantContext> options) : DbContex
     internal DbSet<Tenant> Tenants { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string connectionString = "Server=localhost; Database=Tenant; User=sa; Password:sa123_secret_@#TYuiop; Trusted_Connection=True;";
+        string connectionString = "Server=localhost; Database=Tenant; User=sa; Password=sa123_secret_@#TYuiop; MultipleActiveResultSets=True; TrustServerCertificate=True;";
         optionsBuilder.UseSqlServer(connectionString,
              e => e.MigrationsAssembly(typeof(TenantContext).Assembly.FullName));
     }
