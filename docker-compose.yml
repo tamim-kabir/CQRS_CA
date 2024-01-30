@@ -11,6 +11,8 @@ services:
       SA_PASSWORD: "sa123_secret_@#TYuiop"   
     ports:
       - "1433:1433"
+    networks:
+        - database
 
   api:
     container_name: Api
@@ -22,6 +24,8 @@ services:
         - "5001:443"
     depends_on:
         - mssql-database
+    networks:
+        - api
 
   report:
     container_name: Report
@@ -33,6 +37,8 @@ services:
         - "6001:443"
     depends_on:
         - mssql-database
+    networks:
+        - report
 
   rabbitmq-instance:
     container_name: RabbitMQ.MessageBroker
@@ -48,13 +54,26 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
-    
+    networks:
+    - rabbitmq
+
   tenantServices:
-    container_name: tenant
+    container_name: Tenant
     image: ${DOCKER_REGISTRY-}tenant
     build:
       context: .
       dockerfile: src/Common/TenantServices/Dockerfile
     depends_on:
         - mssql-database
-  
+    ports:
+        - "3001:443"
+    networks:
+    - tenant
+
+networks:
+  database:
+  api:
+  report:
+  rabbitmq:
+  tenant:
+    driver: bridge
