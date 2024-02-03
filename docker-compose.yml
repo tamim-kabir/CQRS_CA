@@ -1,6 +1,46 @@
 version: '3.4'
 
 services:
+  api:
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: src/App/Api/Dockerfile
+    ports:
+      - "20401:8080"
+      - "20402:8081"
+    networks:
+    - application
+    depends_on:
+        - mssql-database
+
+  tenantservices:
+    image: ${DOCKER_REGISTRY-}tenantservices
+    build:
+      context: .
+      dockerfile: src/Common/TenantServices/Dockerfile
+    ports:
+      - "30501:8080"
+      - "30502:8081"
+    networks:
+    - application
+    depends_on:
+        - mssql-database
+
+
+  report.api:
+    image: ${DOCKER_REGISTRY-}reportapi
+    build:
+      context: .
+      dockerfile: src/Report/Report.Api/Dockerfile
+    ports:
+      - "40601:8080"
+      - "40602:8081"
+    networks:
+    - application
+    depends_on:
+        - mssql-database
+
   mssql-database:
     container_name: MsSqlDatabase 
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -11,32 +51,6 @@ services:
       SA_PASSWORD: "sa123_secret_@#TYuiop"   
     ports:
       - "1433:1433"
-    networks:
-        - application
-
-  api:
-    container_name: Api
-    image: ${DOCKER_REGISTRY-}api
-    build:
-      context: .
-      dockerfile: src/App/Api/Dockerfile
-    ports:
-        - "5001:443"
-    depends_on:
-        - mssql-database
-    networks:
-        - application
-
-  report:
-    container_name: Report
-    image: ${DOCKER_REGISTRY-}report
-    build:
-      context: .
-      dockerfile: src/Report/Report.Api/Dockerfile
-    ports:
-        - "6001:443"
-    depends_on:
-        - mssql-database
     networks:
         - application
 
@@ -57,19 +71,9 @@ services:
     networks:
     - application
 
-  tenantServices:
-    container_name: Tenant
-    image: ${DOCKER_REGISTRY-}tenant
-    build:
-      context: .
-      dockerfile: src/Common/TenantServices/Dockerfile
-    depends_on:
-        - mssql-database
-    ports:
-        - "3331:443"
-    networks:
-    - application
-
 networks:
   application:
-    driver: bridge
+     driver: bridge
+        
+
+

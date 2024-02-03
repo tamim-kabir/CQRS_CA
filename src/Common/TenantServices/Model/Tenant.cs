@@ -6,12 +6,12 @@ namespace TenantServices.Model;
 internal class Tenant
 {
     [Key]
-    internal TenantId Id { get; private set; }
+    public TenantId? Id { get; private set; }
     [MaxLength(50)]
-    internal string? Name { get; private set; }
-    internal ProviderType Provider { get; private set; }
+    public string? Name { get; private set; }
+    public ProviderType Provider { get; private set; }
     [MaxLength(500)]
-    internal string? ConnectionString { get; private set; }
+    public string? ConnectionString { get; private set; }
 
     internal static Tenant? CreateTenant(TenantViewModel model)
     {
@@ -27,7 +27,7 @@ internal class Tenant
     {
         return new Tenant
         {
-            //Id = new TenantId(model.Id),
+            Id = new TenantId(Guid.Parse(model.Id!)),
             Name = model.Name,
             ConnectionString = model.ConnectionString,
             Provider = model.Provider,
