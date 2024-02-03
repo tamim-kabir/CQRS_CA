@@ -12,7 +12,7 @@ services:
     ports:
       - "1433:1433"
     networks:
-        - database
+        - application
 
   api:
     container_name: Api
@@ -25,7 +25,7 @@ services:
     depends_on:
         - mssql-database
     networks:
-        - api
+        - application
 
   report:
     container_name: Report
@@ -38,7 +38,7 @@ services:
     depends_on:
         - mssql-database
     networks:
-        - report
+        - application
 
   rabbitmq-instance:
     container_name: RabbitMQ.MessageBroker
@@ -55,7 +55,7 @@ services:
       - '5672:5672'
       - '15672:15672'
     networks:
-    - rabbitmq
+    - application
 
   tenantServices:
     container_name: Tenant
@@ -66,14 +66,10 @@ services:
     depends_on:
         - mssql-database
     ports:
-        - "3001:443"
+        - "3331:443"
     networks:
-    - tenant
+    - application
 
 networks:
-  database:
-  api:
-  report:
-  rabbitmq:
-  tenant:
+  application:
     driver: bridge

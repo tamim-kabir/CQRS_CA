@@ -22,35 +22,35 @@ builder.Services.DatabaseConfiguration(builder.Configuration);
 
 builder.Services.AddControllers()
                 .AddApplicationPart(Presentation.AssemblyReference.Assembly);
-var AppAssebbly = Application.AssemblyReference.Assembly;
+var AppAssembly = Application.AssemblyReference.Assembly;
 builder.Services.AddMediatR(config =>
-    config.RegisterServicesFromAssembly(AppAssebbly));
+    config.RegisterServicesFromAssembly(AppAssembly));
 
-builder.Services.AddValidatorsFromAssembly(AppAssebbly);
+builder.Services.AddValidatorsFromAssembly(AppAssembly);
 
-builder.Services.AddMassTransit(config =>
-{
-    config.SetKebabCaseEndpointNameFormatter();
+//builder.Services.AddMassTransit(config =>
+//{
+//    config.SetKebabCaseEndpointNameFormatter();
 
-    config.AddConsumers(AppAssebbly);
-    config.AddSagaStateMachines(AppAssebbly);
-    config.AddSagas(AppAssebbly);
-    config.AddActivities(AppAssebbly);
+//    config.AddConsumers(AppAssembly);
+//    //config.AddSagaStateMachines(AppAssembly);
+//    //config.AddSagas(AppAssembly);
+//    //config.AddActivities(AppAssembly);
 
-    config.UsingRabbitMq((context, configurator) =>
-    {
-#if DEBUG
-        configurator.Host(builder.Configuration["MessageBroker:Host"], "/", host =>
-#else
-        configurator.Host(new Uri(builder.Configuration["MessageBroker:Host"]!), host =>
-#endif
-        {
-            host.Username(builder.Configuration["MessageBroker:Username"]);
-            host.Password(builder.Configuration["MessageBroker:Password"]);
-        });
-        configurator.ConfigureEndpoints(context);
-    });
-});
+//    config.UsingRabbitMq((context, configurator) =>
+//    {
+//#if DEBUG
+//        configurator.Host(builder.Configuration["MessageBroker:Host"], "/", host =>
+//#else
+//        configurator.Host(new Uri(builder.Configuration["MessageBroker:Host"]!), host =>
+//#endif
+//        {
+//            host.Username(builder.Configuration["MessageBroker:Username"]);
+//            host.Password(builder.Configuration["MessageBroker:Password"]);
+//        });
+//        configurator.ConfigureEndpoints(context);
+//    });
+//});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTransient<ExceptionHandelingMiddleware>();
 builder.Services.AddSwaggerGen();
@@ -67,6 +67,7 @@ if (app.Environment.IsDevelopment())
 //{
 //    app.Environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 //}
+app.UseMiddleware<ExceptionHandelingMiddleware>();
 app.Services.ConfigureServices();
 app.UseSerilogRequestLogging();
 app.UseStaticFiles();
@@ -75,8 +76,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-//Custom Middleware for exception handalling
-app.UseMiddleware<ExceptionHandelingMiddleware>();
 
 app.MapCarter();//Map Minimal api endpoint Using ICarterMoule
 app.MapControllers();
